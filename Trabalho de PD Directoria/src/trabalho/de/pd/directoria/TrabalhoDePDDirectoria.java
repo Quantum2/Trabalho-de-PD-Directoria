@@ -8,7 +8,6 @@ package trabalho.de.pd.directoria;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -20,6 +19,7 @@ public class TrabalhoDePDDirectoria {
 
     static final int port = 7000;
     static String EndIP;
+    static boolean exec = true;
     
     /**
      * @param args the command line arguments
@@ -46,14 +46,18 @@ public class TrabalhoDePDDirectoria {
         System.out.println("O IP do servidor primário é " + EndIP);
     }
     
-    public static void enviarIP(){
+    public static void enviarIP() throws SocketException, IOException{
         do{
             byte[] receiveData = new byte[1024];
             
             System.out.println("A procura de clientes...");
             
+            DatagramSocket clientSocket = new DatagramSocket(port);
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            clientSocket.receive(receivePacket);     
             
-        }while(true);                                         //Eliminar esta bosta
+            
+        }while(exec);                                        
     }
 
 }
