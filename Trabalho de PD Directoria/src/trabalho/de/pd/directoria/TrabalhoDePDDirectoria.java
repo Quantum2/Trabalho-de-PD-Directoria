@@ -36,20 +36,22 @@ public class TrabalhoDePDDirectoria {
         
         System.out.println("A iniciar servidor de directoria...");
 
-        DatagramSocket clientSocket = new DatagramSocket(port);
-
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-
-        EndIP = receivePacket.getAddress().toString();
-        
-        clientSocket.close();
+        try (DatagramSocket clientSocket = new DatagramSocket(port)) {
+            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+            clientSocket.receive(receivePacket);
+            
+            EndIP = receivePacket.getAddress().toString();
+        }
         
         System.out.println("O IP do servidor primário é " + EndIP);
     }
     
     public static void enviarIP(){
         do{
+            byte[] receiveData = new byte[1024];
+            
+            System.out.println("A procura de clientes...");
+            
             
         }while(true);                                         //Eliminar esta bosta
     }
