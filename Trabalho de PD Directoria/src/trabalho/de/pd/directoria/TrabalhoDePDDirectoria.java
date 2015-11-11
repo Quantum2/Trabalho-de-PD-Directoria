@@ -5,11 +5,15 @@
  */
 package trabalho.de.pd.directoria;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -27,10 +31,21 @@ public class TrabalhoDePDDirectoria {
      * @throws java.net.SocketException
      * @throws java.net.UnknownHostException
      * @throws java.lang.InterruptedException
+     * @throws java.lang.ClassNotFoundException
      */
-    public static void main(String[] args) throws UnknownHostException, IOException, SocketException, InterruptedException{
+    public static void main(String[] args) throws UnknownHostException, IOException, SocketException, InterruptedException, ClassNotFoundException{
+        
+        Runnable r = () -> {
+            try {
+                enviarIP();
+            } catch (IOException | InterruptedException | ClassNotFoundException ex) {
+                Logger.getLogger(TrabalhoDePDDirectoria.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        };
+        
+        new Thread(r).start();
+        
         receberIP();
-        enviarIP();
     }
     
     public static void receberIP() throws SocketException, UnknownHostException, IOException{      
@@ -48,10 +63,10 @@ public class TrabalhoDePDDirectoria {
         System.out.println("O IP do servidor primário é " + EndIP);
     }
     
-    public static void enviarIP() throws SocketException, IOException, InterruptedException{
+    public static void enviarIP() throws SocketException, IOException, InterruptedException, ClassNotFoundException{
         do{
             byte[] receiveData = new byte[1024];
-            String temp;
+            ClienteInfo temp;
             
             System.out.println("A procura de clientes...");
             
@@ -61,7 +76,10 @@ public class TrabalhoDePDDirectoria {
             
             System.out.println("Encontrado um cliente...");
             
-            temp = new String(receivePacket.getData());
+            ObjectInputStream ler = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData()));
+            temp = (ClienteInfo) ler.readObject();
+            
+            System.out.println("Novo cliente, IP :" + temp.getUsername());
             
             Thread.sleep(timeToWait);
         }while(exec);                                        
