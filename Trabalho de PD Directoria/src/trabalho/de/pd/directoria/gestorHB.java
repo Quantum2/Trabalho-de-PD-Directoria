@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
@@ -22,22 +24,31 @@ import java.util.logging.Logger;
 public final class gestorHB {
     
     private String EndIP;
+    private final static String grupo = "225.15.15.15";
+    
     final int timeToWait = 5000;
     final int port = 7000;
+    
     private boolean exec;
     
-    DatagramSocket clientSocket;
+    private MulticastSocket clientSocket;
+    private boolean servidorExiste;
 
     public gestorHB() {
         exec = true;
+        InetAddress address;
         
         try {
-            clientSocket = new DatagramSocket(port);
+            address = InetAddress.getByName(grupo);
+            clientSocket = new MulticastSocket(port);
+            clientSocket.joinGroup(address);
         } catch (SocketException ex) {
+            Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void iniciar(){
         Runnable enviar = () -> {
             try {
@@ -76,20 +87,22 @@ public final class gestorHB {
     
     private void enviarIP() throws SocketException, IOException, InterruptedException, ClassNotFoundException{
         do{
-            byte[] receiveData = new byte[1024];
-            ClienteInfo temp;
-            
-            System.out.println("A procura de clientes...");
-            
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            clientSocket.receive(receivePacket);    
-            
-            System.out.println("Encontrado um cliente...");
-            
-            ObjectInputStream ler = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData()));
-            temp = (ClienteInfo) ler.readObject();
-            
-            System.out.println("Novo cliente, IP :" + temp.getUsername());
+            if (servidorExiste) {
+                byte[] receiveData = new byte[1024];
+                ClienteInfo temp;
+
+                System.out.println("A procura de clientes...");
+
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                clientSocket.receive(receivePacket);
+
+                System.out.println("Encontrado um cliente...");
+
+                ObjectInputStream ler = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData()));
+                temp = (ClienteInfo) ler.readObject();
+
+                System.out.println("Novo cliente, IP :" + temp.getUsername());
+            }
             
             Thread.sleep(timeToWait);
         }while(exec);                                        
