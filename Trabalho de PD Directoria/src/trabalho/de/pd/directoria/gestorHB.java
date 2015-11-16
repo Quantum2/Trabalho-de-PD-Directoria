@@ -9,7 +9,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
@@ -24,7 +23,7 @@ import java.util.logging.Logger;
 public final class gestorHB {
     
     private String EndIP;
-    private final static String grupo = "225.15.15.15";
+    private final String grupo = "225.15.15.15";
     
     final int timeToWait = 5000;
     final int port = 7000;
