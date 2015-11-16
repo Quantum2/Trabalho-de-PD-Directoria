@@ -28,13 +28,14 @@ public final class gestorHB {
     final int timeToWait = 5000;
     final int port = 7000;
     
-    private boolean exec;
+    public boolean exec;
     
     private MulticastSocket clientSocket;
     private boolean servidorExiste;
 
     public gestorHB() {
         exec = true;
+        servidorExiste = false;
         InetAddress address;
         
         try {
@@ -48,7 +49,7 @@ public final class gestorHB {
         }
     }
 
-    public void iniciar(){
+    public void iniciar() throws InterruptedException{
         Runnable enviar = () -> {
             try {
                 enviarIP();
@@ -56,8 +57,6 @@ public final class gestorHB {
                 Logger.getLogger(TrabalhoDePDDirectoria.class.getName()).log(Level.SEVERE, null, ex);
             }
         };
-        
-        new Thread(enviar).start();
         
         Runnable receber = () -> {
             try {
@@ -70,6 +69,11 @@ public final class gestorHB {
         };
         
         new Thread(receber).start();
+        
+        while(exec){
+            new Thread(enviar).start();
+            Thread.sleep(timeToWait);
+        }
     }
     
     private void receberIP() throws SocketException, UnknownHostException, IOException {
@@ -80,8 +84,11 @@ public final class gestorHB {
         DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
         clientSocket.receive(receivePacket);
         EndIP = receivePacket.getAddress().toString();
+        
+        if(EndIP != null)
+            servidorExiste = true;
 
-        System.out.println("O IP do servidor primário é " + EndIP);
+        System.out.println("O IP do servidor primário é " + EndIP + " na porta " + receivePacket.getPort());
     }
     
     private void enviarIP() throws SocketException, IOException, InterruptedException, ClassNotFoundException{
