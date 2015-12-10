@@ -13,6 +13,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,12 @@ import java.util.logging.Logger;
  */
 public final class gestorHB {
     
+    HeartbeatsRecebe threadHeartbeatsRecebe=null;
+    VerificaServidores threadVerificaServidores=null;
+    RoundRobin threadRoundRobin=null;
+    
+    int roundRobin=0;
+    
     private String EndIP;
     private final String grupo = "225.15.15.15";
     
@@ -30,8 +37,10 @@ public final class gestorHB {
     
     public boolean exec;
     
-    private MulticastSocket clientSocket;
+    private MulticastSocket multicastSocket;
     private boolean servidorExiste;
+    
+    private ArrayList<HeartBeat> servidores=new ArrayList<HeartBeat>();
 
     public gestorHB() {
         exec = true;
@@ -40,8 +49,8 @@ public final class gestorHB {
         
         try {
             address = InetAddress.getByName(grupo);
-            clientSocket = new MulticastSocket(port);
-            clientSocket.joinGroup(address);
+            multicastSocket = new MulticastSocket(port);
+            multicastSocket.joinGroup(address);
         } catch (SocketException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -49,68 +58,50 @@ public final class gestorHB {
         }
     }
 
-    public void iniciar() throws InterruptedException{
-        Runnable enviar = () -> {
-            try {
-                enviarIP();
-            } catch (IOException | InterruptedException | ClassNotFoundException ex) {
-                Logger.getLogger(TrabalhoDePDDirectoria.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        };
-        
-        Runnable receber = () -> {
-            try {
-                receberIP();
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        };
-        
-        new Thread(receber).start();
-        
-        while(exec){
-            new Thread(enviar).start();
-            Thread.sleep(timeToWait);
-        }
+    public void respondeCliente(int portoUDP,InetAddress endereço,ClienteInfo cliente){
+        RespondeCliente threadResponde=new RespondeCliente(portoUDP,endereço,cliente,this);
+        threadResponde.start();
     }
     
-    private void receberIP() throws SocketException, UnknownHostException, IOException {
-        byte[] receiveData = new byte[1024];
-
-        System.out.println("A iniciar servidor de directoria...");
-
-        DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-        clientSocket.receive(receivePacket);
-        EndIP = receivePacket.getAddress().toString();
-        
-        if(EndIP != null)
-            servidorExiste = true;
-
-        System.out.println("O IP do servidor primário é " + EndIP + " na porta " + receivePacket.getPort());
-    }
     
-    private void enviarIP() throws SocketException, IOException, InterruptedException, ClassNotFoundException{
-        do{
-            if (servidorExiste) {
-                byte[] receiveData = new byte[1024];
-                ClienteInfo temp;
-
-                System.out.println("A procura de clientes...");
-
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                clientSocket.receive(receivePacket);
-
-                System.out.println("Encontrado um cliente...");
-
-                ObjectInputStream ler = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData()));
-                temp = (ClienteInfo) ler.readObject();
-
-                System.out.println("Novo cliente, IP :" + temp.getUsername());
-            }
+    public void iniciar(){
+        try {
+            threadHeartbeatsRecebe=new HeartbeatsRecebe(this);
+            threadHeartbeatsRecebe.start();
             
-            Thread.sleep(timeToWait);
-        }while(exec);                                        
+            threadVerificaServidores=new VerificaServidores(this);
+            threadVerificaServidores.start();
+            
+            threadRoundRobin=new RoundRobin(this);
+            threadRoundRobin.start();
+            
+            threadHeartbeatsRecebe.join();
+        } catch (SocketException ex) {
+            Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }
+        
+    public MulticastSocket getMulticastSocket(){
+        return multicastSocket;
+    }
+    
+    public void addServidores(HeartBeat heartBeat){
+        this.servidores.add(heartBeat);
+    }
+    
+    public ArrayList<HeartBeat> getServidores(){
+        return servidores;
+    }
+    
+    public void setRoundRobin(int roundRobin){
+        this.roundRobin=roundRobin;
+    }
+    
+    public int getRoundRobin(){
+        return roundRobin;
     }
 }

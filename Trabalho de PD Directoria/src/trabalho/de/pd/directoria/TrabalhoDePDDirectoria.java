@@ -17,7 +17,7 @@ public class TrabalhoDePDDirectoria {
      * @param args the command line arguments
      */
     public static void main(String[] args){
-       gestorHB gest = new gestorHB();         
+       gestorHB gest = new gestorHB();
        gest.iniciar();
     }
 }
