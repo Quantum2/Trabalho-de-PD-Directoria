@@ -17,6 +17,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import trabalho.de.pd.ClienteInfo;
 
 /**
  *
@@ -50,7 +51,7 @@ public class RespondeCliente extends Thread{
             String linha;
             boolean flg=false;
             
-            FileReader file=new FileReader("C:\\Users\\ASUS\\Desktop\\Trabalho-de-PD-Directoria\\Trabalho de PD Directoria\\Clientes\\Clientes.txt");
+            FileReader file=new FileReader("C:\\Users\\Carlos Oliveira\\Desktop\\Testes Trabalho PD\\UsernamesPasswords.txt");
             BufferedReader br=new BufferedReader(file);
             
             while((linha=br.readLine())!=null){
@@ -62,7 +63,7 @@ public class RespondeCliente extends Thread{
             if(flg){
                 ByteArrayOutputStream byteout=new ByteArrayOutputStream();
                 ObjectOutputStream send = new ObjectOutputStream(byteout);
-                send.writeObject(gestor.getServidores().get(gestor.getRoundRobin()));
+                send.writeObject(gestor.getRoundRobinServer());
                 send.flush();
                 
                 packet=new DatagramPacket(byteout.toByteArray(),byteout.size(),endereço,portoUDP);

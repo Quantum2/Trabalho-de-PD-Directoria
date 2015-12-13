@@ -15,6 +15,7 @@ import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.servidor.HeartBeat;
+import trabalho.de.pd.ClienteInfo;
 
 /**
  *
@@ -60,20 +61,26 @@ public class HeartbeatsRecebe extends Thread{
                 msg = (Object) recv.readObject();
                 long tInicial=System.currentTimeMillis();
                 if(msg instanceof HeartBeat){
+                    /*
                     for(int i=0;i<gestor.getServidores().size();i++){
-                        HeartBeat hb = (HeartBeat)msg;
                         if(gestor.getServidores().get(i)==msg){
                             gestor.getServidores().get(i).setTStart(tInicial);
                             break;
                         }
                     }
+                    */
+                    System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + ((HeartBeat) msg).getPrimario());
+                    gestor.trataHeartBeat(tInicial,(HeartBeat)msg);
+                    gestor.verificaServidores(tInicial+10, (HeartBeat)msg);
                 }else{
                     if(msg instanceof ClienteInfo){
                         ClienteInfo c=(ClienteInfo)msg;
-                        gestor.respondeCliente(packet.getPort(),InetAddress.getByName(packet.getSocketAddress().toString()),c);
+                        gestor.respondeCliente(packet.getPort(),packet.getAddress(),c);
+                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " +((ClienteInfo)msg).getUsername()
+                        + ((ClienteInfo)msg).getPassword());
                     }
                 }
-                System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + ((HeartBeat) msg).getPrimario());
+                
             } catch (NumberFormatException e) {
                 System.out.println("O porto de escuta deve ser um inteiro positivo.");
             } catch (SocketException e) {
