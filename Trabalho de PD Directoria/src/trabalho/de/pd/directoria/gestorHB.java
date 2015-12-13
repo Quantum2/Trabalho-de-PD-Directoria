@@ -5,17 +5,15 @@
  */
 package trabalho.de.pd.directoria;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import trabalho.de.pd.servidor.HeartBeat;
+
 
 /**
  *
@@ -29,18 +27,17 @@ public final class gestorHB {
     
     int roundRobin=0;
     
-    private String EndIP;
     private final String grupo = "225.15.15.15";
     
     final int timeToWait = 5000;
     final int port = 7000;
     
     public boolean exec;
+    public boolean servidorExiste = false;
     
     private MulticastSocket multicastSocket;
-    private boolean servidorExiste;
     
-    private ArrayList<HeartBeat> servidores=new ArrayList<HeartBeat>();
+    private ArrayList<HeartBeat> servidores=new ArrayList<>();
 
     public gestorHB() {
         exec = true;

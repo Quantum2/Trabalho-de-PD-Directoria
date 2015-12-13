@@ -14,6 +14,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import trabalho.de.pd.servidor.HeartBeat;
 
 /**
  *
@@ -56,10 +57,11 @@ public class HeartbeatsRecebe extends Thread{
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
                 gestor.getMulticastSocket().receive(packet);
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
-                msg = recv.readObject();
+                msg = (Object) recv.readObject();
                 long tInicial=System.currentTimeMillis();
                 if(msg instanceof HeartBeat){
                     for(int i=0;i<gestor.getServidores().size();i++){
+                        HeartBeat hb = (HeartBeat)msg;
                         if(gestor.getServidores().get(i)==msg){
                             gestor.getServidores().get(i).setTStart(tInicial);
                             break;
@@ -71,7 +73,7 @@ public class HeartbeatsRecebe extends Thread{
                         gestor.respondeCliente(packet.getPort(),InetAddress.getByName(packet.getSocketAddress().toString()),c);
                     }
                 }
-                System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress());
+                System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + ((HeartBeat) msg).getPrimario());
             } catch (NumberFormatException e) {
                 System.out.println("O porto de escuta deve ser um inteiro positivo.");
             } catch (SocketException e) {

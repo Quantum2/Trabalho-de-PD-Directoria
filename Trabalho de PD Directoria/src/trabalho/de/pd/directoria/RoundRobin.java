@@ -31,7 +31,7 @@ public class RoundRobin extends Thread{
         while(running){
             try {
                 sleep(5000);
-                if(gestor.getServidores().size()!=0){
+                if(!gestor.getServidores().isEmpty()){
                     if(gestor.getServidores().size()>gestor.getRoundRobin()+1){
                         gestor.setRoundRobin(gestor.getRoundRobin()+1);
                     }else{
