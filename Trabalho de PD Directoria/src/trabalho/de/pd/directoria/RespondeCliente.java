@@ -18,6 +18,7 @@ import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.ClienteInfo;
+import trabalho.de.pd.servidor.HeartBeat;
 
 /**
  *
@@ -63,7 +64,8 @@ public class RespondeCliente extends Thread{
             if(flg){
                 ByteArrayOutputStream byteout=new ByteArrayOutputStream();
                 ObjectOutputStream send = new ObjectOutputStream(byteout);
-                send.writeObject(gestor.getRoundRobinServer());
+                HeartBeat hAux = gestor.getRoundRobinServer();
+                send.writeObject(hAux);
                 send.flush();
                 
                 packet=new DatagramPacket(byteout.toByteArray(),byteout.size(),endereço,portoUDP);

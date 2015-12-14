@@ -52,6 +52,7 @@ public class HeartbeatsRecebe extends Thread{
     public void run()  {   //falta fazer quando ha mais do que 1 primario && o fazer o tempo de 5 segundos a espera e nao com o timeout
         System.out.println("Thread HeartbeatsRecebe a correr...");
         Object msg=null;
+        long tInicial=0;
         do {
             try {
                 msg=null;
@@ -59,7 +60,7 @@ public class HeartbeatsRecebe extends Thread{
                 gestor.getMulticastSocket().receive(packet);
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
                 msg = (Object) recv.readObject();
-                long tInicial=System.currentTimeMillis();
+                tInicial=System.currentTimeMillis();
                 if(msg instanceof HeartBeat){
                     /*
                     for(int i=0;i<gestor.getServidores().size();i++){
@@ -70,14 +71,13 @@ public class HeartbeatsRecebe extends Thread{
                     }
                     */
                     System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + ((HeartBeat) msg).getPrimario());
-                    gestor.trataHeartBeat(tInicial,(HeartBeat)msg);
-                    gestor.verificaServidores(tInicial+10, (HeartBeat)msg);
+                    
                 }else{
                     if(msg instanceof ClienteInfo){
                         ClienteInfo c=(ClienteInfo)msg;
                         gestor.respondeCliente(packet.getPort(),packet.getAddress(),c);
-                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " +((ClienteInfo)msg).getUsername()
-                        + ((ClienteInfo)msg).getPassword());
+                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " + packet.getPort()
+                                +((ClienteInfo)msg).getUsername() + ((ClienteInfo)msg).getPassword());
                     }
                 }
                 
@@ -86,11 +86,16 @@ public class HeartbeatsRecebe extends Thread{
             } catch (SocketException e) {
                 System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
             } catch (SocketTimeoutException e) {
-
+                
             } catch (IOException e) {
                 System.out.println("Ocorreu um erro no acesso ao socket:\n\t" + e);
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
+            } finally { 
+                if (msg instanceof HeartBeat){
+                    gestor.trataHeartBeat(tInicial,(HeartBeat)msg);
+                    gestor.verificaServidores(tInicial+10, (HeartBeat)msg);
+                }
             }
         } while (running);
     }
