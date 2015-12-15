@@ -27,6 +27,7 @@ public final class gestorHB {
     HeartbeatsRecebe threadHeartbeatsRecebe=null;
     VerificaServidores threadVerificaServidores=null;
     RoundRobin threadRoundRobin=null;
+    RespondeCliente threadRespondeCliente=null;
     
     int roundRobin=0;
     
@@ -65,16 +66,20 @@ public final class gestorHB {
         }
     }
 
+    /*
     public void respondeCliente(int portoUDP,InetAddress endereço,ClienteInfo cliente){
         RespondeCliente threadResponde=new RespondeCliente(portoUDP,endereço,cliente,this);
         threadResponde.start();
     }
-    
+    */
     
     public void iniciar(){
         try {
             threadHeartbeatsRecebe=new HeartbeatsRecebe(this);
             threadHeartbeatsRecebe.start();
+            
+            threadRespondeCliente = new RespondeCliente(this);
+            threadRespondeCliente.start();
             
             //threadVerificaServidores=new VerificaServidores(this);
             //threadVerificaServidores.start();
@@ -83,6 +88,7 @@ public final class gestorHB {
             //threadRoundRobin.start();
             
             threadHeartbeatsRecebe.join();
+            threadRespondeCliente.acaba();
         } catch (SocketException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (InterruptedException ex) {
@@ -135,6 +141,10 @@ public final class gestorHB {
     
     public MulticastSocket getMulticastSocket(){
         return multicastSocket;
+    }
+    
+    public DatagramSocket getDatagramSocket() {
+        return datagramSocket;
     }
     
     public void addServidores(HeartBeat heartBeat){

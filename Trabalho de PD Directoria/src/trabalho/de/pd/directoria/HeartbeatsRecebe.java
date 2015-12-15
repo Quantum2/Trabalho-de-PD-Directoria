@@ -15,7 +15,6 @@ import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.servidor.HeartBeat;
-import trabalho.de.pd.ClienteInfo;
 
 /**
  *
@@ -70,17 +69,19 @@ public class HeartbeatsRecebe extends Thread{
                         }
                     }
                     */
-                    System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + ((HeartBeat) msg).getPrimario());
+                    System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + " Tipo: " + ((HeartBeat) msg).getPrimario());
                     
-                }else{
+                }
+                /*
+                else{
                     if(msg instanceof ClienteInfo){
                         ClienteInfo c=(ClienteInfo)msg;
                         gestor.respondeCliente(packet.getPort(),packet.getAddress(),c);
-                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " + packet.getPort()
+                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " + packet.getPort() + " "
                                 +((ClienteInfo)msg).getUsername() + ((ClienteInfo)msg).getPassword());
                     }
                 }
-                
+                */
             } catch (NumberFormatException e) {
                 System.out.println("O porto de escuta deve ser um inteiro positivo.");
             } catch (SocketException e) {
