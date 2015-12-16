@@ -6,7 +6,6 @@
 package trabalho.de.pd.directoria;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import trabalho.de.pd.ClienteInfo;
 import trabalho.de.pd.servidor.HeartBeat;
 
 
@@ -35,7 +33,6 @@ public final class gestorHB {
     
     final int timeToWait = 5000;
     final int port = 7000;
-    final int udpPort = 7001;
     
     public boolean exec;
     public boolean servidorExiste = false;
