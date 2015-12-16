@@ -14,9 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.ClienteInfo;
@@ -50,7 +48,7 @@ public class RespondeCliente extends Thread{
             try {
                 ClienteInfo cliente=null;
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
-                gestor.getDatagramSocket().receive(packet);
+                gestor.getMulticastSocket().receive(packet);
                 endereço=packet.getAddress();
                 porto=packet.getPort();
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
@@ -79,7 +77,7 @@ public class RespondeCliente extends Thread{
                     send.flush();
 
                     packet = new DatagramPacket(byteout.toByteArray(), byteout.size(), endereço, porto);
-                    gestor.getDatagramSocket().send(packet);
+                    gestor.getMulticastSocket().send(packet);
                 } else {
                     System.out.println("[GESTOR] Dados login errados");
                 }

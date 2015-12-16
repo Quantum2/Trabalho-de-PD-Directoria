@@ -42,8 +42,6 @@ public final class gestorHB {
     
     private MulticastSocket multicastSocket;
     
-    private DatagramSocket datagramSocket;
-    
     private ArrayList<HeartBeat> servidores=new ArrayList<>();
     private HashMap<HeartBeat,Long> temposHeartBeats = new HashMap<>();
 
@@ -57,8 +55,6 @@ public final class gestorHB {
             multicastSocket = new MulticastSocket(port);
             multicastSocket.setSoTimeout(5000);
             multicastSocket.joinGroup(address);
-            datagramSocket = new DatagramSocket(udpPort);
-            datagramSocket.setSoTimeout(5000);
         } catch (SocketException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -141,10 +137,6 @@ public final class gestorHB {
     
     public MulticastSocket getMulticastSocket(){
         return multicastSocket;
-    }
-    
-    public DatagramSocket getDatagramSocket() {
-        return datagramSocket;
     }
     
     public void addServidores(HeartBeat heartBeat){
