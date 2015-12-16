@@ -31,7 +31,6 @@ public class RespondeCliente extends Thread{
     
     InetAddress endereço=null;
     int porto=0;
-    DatagramSocket socket=null;
     DatagramPacket packet=null;
     ClienteInfo cliente=null;
     gestorHB gestor=null;
@@ -39,12 +38,6 @@ public class RespondeCliente extends Thread{
     
     public RespondeCliente(gestorHB gestor){
         this.gestor=gestor;
-        
-        try {
-            socket=new DatagramSocket();
-        } catch (SocketException ex) {
-            Logger.getLogger(RespondeCliente.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     public void acaba() {
@@ -69,7 +62,7 @@ public class RespondeCliente extends Thread{
                 String linha;
                 boolean flg = false;
 
-                FileReader file = new FileReader("C:\\Users\\Carlos Oliveira\\Desktop\\Testes Trabalho PD\\UsernamesPasswords.txt");
+                FileReader file = new FileReader(System.getProperty("user.dir")+"\\UsernamesPasswords.txt");
                 BufferedReader br = new BufferedReader(file);
 
                 while ((linha = br.readLine()) != null) {
@@ -86,7 +79,7 @@ public class RespondeCliente extends Thread{
                     send.flush();
 
                     packet = new DatagramPacket(byteout.toByteArray(), byteout.size(), endereço, porto);
-                    socket.send(packet);
+                    gestor.getDatagramSocket().send(packet);
                 } else {
                     System.out.println("[GESTOR] Dados login errados");
                 }
@@ -98,6 +91,5 @@ public class RespondeCliente extends Thread{
                 Logger.getLogger(RespondeCliente.class.getName()).log(Level.SEVERE, null, ex);
             }
         } while (continuar);
-        socket.close();
     }
 }

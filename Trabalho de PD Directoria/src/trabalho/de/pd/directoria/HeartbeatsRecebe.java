@@ -14,6 +14,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import trabalho.de.pd.ClienteInfo;
 import trabalho.de.pd.servidor.HeartBeat;
 
 /**
@@ -48,40 +49,35 @@ public class HeartbeatsRecebe extends Thread{
     }
 
     @Override
-    public void run()  {   //falta fazer quando ha mais do que 1 primario && o fazer o tempo de 5 segundos a espera e nao com o timeout
+    public void run()  {
         System.out.println("Thread HeartbeatsRecebe a correr...");
         Object msg=null;
+        boolean flg=false;
         long tInicial=0;
         do {
             try {
                 msg=null;
+                flg=false;
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
                 gestor.getMulticastSocket().receive(packet);
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
                 msg = (Object) recv.readObject();
                 tInicial=System.currentTimeMillis();
                 if(msg instanceof HeartBeat){
-                    /*
                     for(int i=0;i<gestor.getServidores().size();i++){
                         if(gestor.getServidores().get(i)==msg){
                             gestor.getServidores().get(i).setTStart(tInicial);
+                            flg=true;
                             break;
                         }
                     }
-                    */
-                    System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + " Tipo: " + ((HeartBeat) msg).getPrimario());
-                    
-                }
-                /*
-                else{
-                    if(msg instanceof ClienteInfo){
-                        ClienteInfo c=(ClienteInfo)msg;
-                        gestor.respondeCliente(packet.getPort(),packet.getAddress(),c);
-                        System.out.println("[GESTOR] Received Client Connection " + packet.getAddress().getHostAddress() + " " + packet.getPort() + " "
-                                +((ClienteInfo)msg).getUsername() + ((ClienteInfo)msg).getPassword());
+                    if(flg==false){
+                        HeartBeat gH=(HeartBeat)msg;
+                        gH.setTStart(tInicial);
+                        gestor.getServidores().add(gH);
                     }
+                    System.out.println("[GESTOR] Received Heartbeat " + packet.getAddress().getHostAddress() + " Tipo: " + ((HeartBeat) msg).getPrimario());                   
                 }
-                */
             } catch (NumberFormatException e) {
                 System.out.println("O porto de escuta deve ser um inteiro positivo.");
             } catch (SocketException e) {
