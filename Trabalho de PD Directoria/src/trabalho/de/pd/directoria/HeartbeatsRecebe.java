@@ -14,7 +14,6 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import trabalho.de.pd.ClienteInfo;
 import trabalho.de.pd.servidor.HeartBeat;
 
 /**
@@ -64,15 +63,15 @@ public class HeartbeatsRecebe extends Thread{
                 msg = (Object) recv.readObject();
                 tInicial=System.currentTimeMillis();
                 if(msg instanceof HeartBeat){
+                    HeartBeat gH=(HeartBeat)msg;
                     for(int i=0;i<gestor.getServidores().size();i++){
-                        if(gestor.getServidores().get(i)==msg){
+                        if(gestor.getServidores().get(i).equals(gH)){
                             gestor.getServidores().get(i).setTStart(tInicial);
                             flg=true;
                             break;
                         }
                     }
-                    if(flg==false){
-                        HeartBeat gH=(HeartBeat)msg;
+                    if(flg==false){              
                         gH.setTStart(tInicial);
                         gestor.getServidores().add(gH);
                     }
