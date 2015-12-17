@@ -58,7 +58,7 @@ public class HeartbeatsRecebe extends Thread{
                 msg=null;
                 flg=false;
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
-                gestor.getMulticastSocket().receive(packet);
+                gestor.getMulticastSocketServidor().receive(packet);      //talvez seja melhor usar dois multicast em portos diferentes
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
                 msg = (Object) recv.readObject();
                 tInicial=System.currentTimeMillis();

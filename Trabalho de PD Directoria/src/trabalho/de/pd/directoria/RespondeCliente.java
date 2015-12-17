@@ -48,7 +48,7 @@ public class RespondeCliente extends Thread{
             try {
                 ClienteInfo cliente=null;
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
-                gestor.getMulticastSocket().receive(packet);
+                gestor.getMulticastSocketCliente().receive(packet);
                 endereço=packet.getAddress();
                 porto=packet.getPort();
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
@@ -77,7 +77,7 @@ public class RespondeCliente extends Thread{
                     send.flush();
 
                     packet = new DatagramPacket(byteout.toByteArray(), byteout.size(), endereço, porto);
-                    gestor.getMulticastSocket().send(packet);
+                    gestor.getMulticastSocketCliente().send(packet);
                 } else {
                     System.out.println("[GESTOR] Dados login errados");
                 }

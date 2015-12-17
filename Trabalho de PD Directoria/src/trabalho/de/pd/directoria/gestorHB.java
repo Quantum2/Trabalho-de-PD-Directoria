@@ -23,7 +23,6 @@ import trabalho.de.pd.servidor.HeartBeat;
 public final class gestorHB {
     
     HeartbeatsRecebe threadHeartbeatsRecebe=null;
-    VerificaServidores threadVerificaServidores=null;
     RoundRobin threadRoundRobin=null;
     RespondeCliente threadRespondeCliente=null;
     
@@ -37,7 +36,8 @@ public final class gestorHB {
     public boolean exec;
     public boolean servidorExiste = false;
     
-    private MulticastSocket multicastSocket;
+    private MulticastSocket multicastSocketServidor;
+    private MulticastSocket multicastSocketCliente;
     
     private ArrayList<HeartBeat> servidores=new ArrayList<>();
     private HashMap<HeartBeat,Long> temposHeartBeats = new HashMap<>();
@@ -49,9 +49,13 @@ public final class gestorHB {
         
         try {
             address = InetAddress.getByName(grupo);
-            multicastSocket = new MulticastSocket(port);
-            multicastSocket.setSoTimeout(5000);
-            multicastSocket.joinGroup(address);
+            multicastSocketServidor = new MulticastSocket(port);
+            multicastSocketServidor.setSoTimeout(5000);
+            multicastSocketServidor.joinGroup(address);
+            
+            multicastSocketCliente = new MulticastSocket(port+1);
+            multicastSocketCliente.setSoTimeout(5000);
+            multicastSocketCliente.joinGroup(address);
         } catch (SocketException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -73,12 +77,6 @@ public final class gestorHB {
             
             threadRespondeCliente = new RespondeCliente(this);
             threadRespondeCliente.start();
-            
-            //threadVerificaServidores=new VerificaServidores(this);
-            //threadVerificaServidores.start();
-            
-            //threadRoundRobin=new RoundRobin(this);
-            //threadRoundRobin.start();
             
             threadHeartbeatsRecebe.join();
             threadRespondeCliente.acaba();
@@ -117,7 +115,7 @@ public final class gestorHB {
         }
     }
         
-    public HeartBeat getRoundRobinServer() {
+    public HeartBeat getRoundRobinServer() {  //acho que isto ficava melhor na thread
         if (!servidores.isEmpty()) {
             if (roundRobin < 0 || roundRobin >= servidores.size()) {
                 roundRobin = servidores.size() - 1;
@@ -132,8 +130,12 @@ public final class gestorHB {
         return null;
     }
     
-    public MulticastSocket getMulticastSocket(){
-        return multicastSocket;
+    public MulticastSocket getMulticastSocketServidor(){
+        return multicastSocketServidor;
+    }
+    
+    public MulticastSocket getMulticastSocketCliente(){
+        return multicastSocketCliente;
     }
     
     public void addServidores(HeartBeat heartBeat){
