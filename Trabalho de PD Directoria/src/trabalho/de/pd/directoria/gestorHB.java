@@ -6,6 +6,7 @@
 package trabalho.de.pd.directoria;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.SocketException;
@@ -37,7 +38,7 @@ public final class gestorHB {
     public boolean servidorExiste = false;
     
     private MulticastSocket multicastSocketServidor;
-    private MulticastSocket multicastSocketCliente;
+    private DatagramSocket datagramSocketCliente;
     
     private ArrayList<HeartBeat> servidores=new ArrayList<>();
     private HashMap<HeartBeat,Long> temposHeartBeats = new HashMap<>();
@@ -53,9 +54,8 @@ public final class gestorHB {
             multicastSocketServidor.setSoTimeout(5000);
             multicastSocketServidor.joinGroup(address);
             
-            multicastSocketCliente = new MulticastSocket(port+1);
-            multicastSocketCliente.setSoTimeout(5000);
-            multicastSocketCliente.joinGroup(address);
+            datagramSocketCliente = new MulticastSocket(port+1);
+            datagramSocketCliente.setSoTimeout(5000);
         } catch (SocketException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -134,8 +134,8 @@ public final class gestorHB {
         return multicastSocketServidor;
     }
     
-    public MulticastSocket getMulticastSocketCliente(){
-        return multicastSocketCliente;
+    public DatagramSocket getDatagramSocketCliente(){
+        return datagramSocketCliente;
     }
     
     public void addServidores(HeartBeat heartBeat){

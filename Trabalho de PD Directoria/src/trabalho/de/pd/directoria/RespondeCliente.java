@@ -17,7 +17,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import trabalho.de.pd.ClienteInfo;
+import trabalho.de.pd.servidor.ClienteInfo;
 import static trabalho.de.pd.directoria.HeartbeatsRecebe.MAX_SIZE;
 import trabalho.de.pd.servidor.HeartBeat;
 
@@ -48,7 +48,7 @@ public class RespondeCliente extends Thread{
             try {
                 ClienteInfo cliente=null;
                 packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
-                gestor.getMulticastSocketCliente().receive(packet);
+                gestor.getDatagramSocketCliente().receive(packet);
                 endereço=packet.getAddress();
                 porto=packet.getPort();
                 ObjectInputStream recv = new ObjectInputStream(new ByteArrayInputStream(packet.getData(), 0, packet.getLength()));
@@ -77,7 +77,7 @@ public class RespondeCliente extends Thread{
                     send.flush();
 
                     packet = new DatagramPacket(byteout.toByteArray(), byteout.size(), endereço, porto);
-                    gestor.getMulticastSocketCliente().send(packet);
+                    gestor.getDatagramSocketCliente().send(packet);
                 } else {
                     System.out.println("[GESTOR] Dados login errados");
                 }
