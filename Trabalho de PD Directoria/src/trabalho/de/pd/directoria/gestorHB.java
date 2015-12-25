@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.servidor.HeartBeat;
+import trabalho.de.pd.servidor.RMIInfo;
 
 
 /**
@@ -22,6 +23,9 @@ import trabalho.de.pd.servidor.HeartBeat;
  * @author Rafael
  */
 public final class gestorHB {
+    //RMI
+    ArrayList<RMIInfo> rmiInfo=new ArrayList<>();
+    RMIListener rmiListener=null;
     
     HeartbeatsRecebe threadHeartbeatsRecebe=null;
     RoundRobin threadRoundRobin=null;
@@ -61,6 +65,9 @@ public final class gestorHB {
         } catch (IOException ex) {
             Logger.getLogger(gestorHB.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //rmi
+        rmiListener=new RMIListener(this);
     }
 
     /*
@@ -152,5 +159,13 @@ public final class gestorHB {
     
     public int getRoundRobin(){
         return roundRobin;
+    }
+    
+    public void addInfoRMI(RMIInfo rmiInfo){
+        this.rmiInfo.add(rmiInfo);
+    }
+    
+    public RMIListener getRMIListener(){
+        return rmiListener;
     }
 }
