@@ -8,7 +8,8 @@ package trabalho.de.pd.directoria;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import trabalho.de.pd.servidor.RMIServidor;
+import trabalho.de.pd.servidor.RMIServidorInterface;
+import trabalho.de.pd.servidor.RMIInfo;
 
 /**
  *
@@ -26,13 +27,13 @@ public class RMIListener {
     public void OuveRMI(String endereço) {
         try {
             String objectUrl = "rmi://127.0.0.1/RemoteTime"; //rmiregistry on localhost
-
+            System.out.println("[RMIDIRETORIA] Endereço:"+endereço);
             objectUrl = "rmi://" + endereço + "/RMITrabalho";
 
-            RMIServidor rmiServidor = (RMIServidor) Naming.lookup(objectUrl);
-
-            this.gestor.addInfoRMI(rmiServidor.getInfo());
-
+            RMIServidorInterface rmiServidor = (RMIServidorInterface) Naming.lookup(objectUrl);
+            RMIInfo info=(RMIInfo)rmiServidor.getInfo();
+            this.gestor.addInfoRMI(info);
+            System.out.println("[RMIDIRETORIA] Info obtido");
         } catch (RemoteException e) {
             System.out.println("Erro remoto - " + e);
         } catch (NotBoundException e) {
