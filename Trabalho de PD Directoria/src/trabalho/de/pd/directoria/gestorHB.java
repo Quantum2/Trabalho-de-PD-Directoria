@@ -116,21 +116,13 @@ public final class gestorHB {
     }
     
     public void verificaServidores(long tFinal, HeartBeat hb) {
-        if (servidores.size() > 0) {
-            for (int i = 0; i < servidores.size(); i++) {
-                if (servidores.get(i).getPrimario() == true) {
-                    RMIIPprimario = servidores.get(i).getEndereço();
-                }
-            }
-            
-            for (int i = 0; i < servidores.size(); i++){
-                if (hb.equals(servidores.get(i))) {
-                    long resultado = tFinal - temposHeartBeats.get(servidores.get(i));
-                    if (resultado / 1000.0 > 15) {
-                        temposHeartBeats.remove(servidores.get(i));
-                        HeartBeat h = servidores.remove(i);
-                        System.out.println("[GESTOR] A esquecer servidor " + h.getEndereço().getHostAddress() + ":" + h.getTcpPort() + " " + h.getPrimario());
-                    }
+        for (int i = 0; i < servidores.size(); i++) {
+            if (hb.equals(servidores.get(i))) {
+                long resultado = tFinal - temposHeartBeats.get(servidores.get(i));
+                if (resultado / 1000.0 > 15) {
+                    temposHeartBeats.remove(servidores.get(i));
+                    HeartBeat h = servidores.remove(i);
+                    System.out.println("[GESTOR] A esquecer servidor " + h.getEndereço().getHostAddress() + ":" + h.getTcpPort() + " " + h.getPrimario());
                 }
             }
         }
