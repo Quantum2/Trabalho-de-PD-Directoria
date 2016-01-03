@@ -8,14 +8,20 @@ package trabalho.de.pd.directoria;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.MulticastSocket;
 import java.net.SocketException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import trabalho.de.pd.servidor.HeartBeat;
 import trabalho.de.pd.servidor.RMIInfo;
+import trabalho.de.pd.servidor.RMIServidorInterface;
+import trabalho.de.pd.servidor.Servidor;
 
 
 /**
@@ -26,9 +32,9 @@ public final class gestorHB {
     //RMI
     ArrayList<RMIInfo> rmiInfo=new ArrayList<>();
     RMIListener rmiListener=null;
+    InetAddress RMIIPprimario=null;
     
     HeartbeatsRecebe threadHeartbeatsRecebe=null;
-    RoundRobin threadRoundRobin=null;
     RespondeCliente threadRespondeCliente=null;
     
     int roundRobin=0;
@@ -110,19 +116,27 @@ public final class gestorHB {
     }
     
     public void verificaServidores(long tFinal, HeartBeat hb) {
-        for (int i=0;i<servidores.size();i++) {
-            if (hb.equals(servidores.get(i))) {
-                long resultado = tFinal-temposHeartBeats.get(servidores.get(i));
-                if(resultado/1000.0>15){
-                    temposHeartBeats.remove(servidores.get(i));
-                    HeartBeat h = servidores.remove(i);
-                    System.out.println("[GESTOR] A esquecer servidor " + h.getEndereço().getHostAddress()+":"+h.getTcpPort()+" "+h.getPrimario());
+        if (servidores.size() > 0) {
+            for (int i = 0; i < servidores.size(); i++) {
+                if (servidores.get(i).getPrimario() == true) {
+                    RMIIPprimario = servidores.get(i).getEndereço();
+                }
+            }
+            
+            for (int i = 0; i < servidores.size(); i++){
+                if (hb.equals(servidores.get(i))) {
+                    long resultado = tFinal - temposHeartBeats.get(servidores.get(i));
+                    if (resultado / 1000.0 > 15) {
+                        temposHeartBeats.remove(servidores.get(i));
+                        HeartBeat h = servidores.remove(i);
+                        System.out.println("[GESTOR] A esquecer servidor " + h.getEndereço().getHostAddress() + ":" + h.getTcpPort() + " " + h.getPrimario());
+                    }
                 }
             }
         }
     }
         
-    public HeartBeat getRoundRobinServer() {  //acho que isto ficava melhor na thread
+    public HeartBeat getRoundRobinServer() {
         if (!servidores.isEmpty()) {
             if (roundRobin < 0 || roundRobin >= servidores.size()) {
                 roundRobin = servidores.size() - 1;
@@ -167,5 +181,13 @@ public final class gestorHB {
     
     public RMIListener getRMIListener(){
         return rmiListener;
+    }
+    
+    public ArrayList<RMIInfo> getArrayRMIInfo(){
+        return rmiInfo;
+    }
+    
+    public  InetAddress getRMIIPprimario(){
+        return RMIIPprimario;
     }
 }

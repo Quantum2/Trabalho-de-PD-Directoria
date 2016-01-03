@@ -77,7 +77,8 @@ public class HeartbeatsRecebe extends Thread{
                         }
                     }
                     if(flg==false){
-                        gestor.getRMIListener().OuveRMI(packet.getAddress().getHostAddress());
+                        if(gestor.getArrayRMIInfo().size()==0)
+                            gestor.getRMIListener().OuveRMI(packet.getAddress().getHostAddress());
                         gH.setTStart(tInicial);
                         gestor.getServidores().add(gH);
                     }

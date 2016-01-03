@@ -29,7 +29,7 @@ public class RMIListener {
             String objectUrl = "rmi://127.0.0.1/RemoteTime"; //rmiregistry on localhost
             System.out.println("[RMIDIRETORIA] Endereço:"+endereço);
             objectUrl = "rmi://" + endereço + "/RMITrabalho";
-
+            
             RMIServidorInterface rmiServidor = (RMIServidorInterface) Naming.lookup(objectUrl);
             RMIInfo info=(RMIInfo)rmiServidor.getInfo();
             this.gestor.addInfoRMI(info);
